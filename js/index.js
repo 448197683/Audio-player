@@ -14,6 +14,7 @@ let currentNumber = 0;
 let randomNumber;
 let islooping = false;
 let intervalID;
+let pausedTime;
 
 const songs = [
   {
@@ -84,7 +85,12 @@ const playSong = () => {
     const albumTittleArtist = document.querySelector('.albumTittleArtist');
     albumTittleSong.innerHTML = currentSong.songName;
     albumTittleArtist.innerHTML = currentSong.artistName;
-    musicFile.play();
+    if (pausedTime) {
+      musicFile.currentTime = pausedTime;
+      musicFile.play();
+    } else {
+      musicFile.play();
+    }
     intervalID = setInterval(seekBar, 1000);
     playSongBtn.classList.add('hide');
     pauseSongBtn.classList.remove('hide');
@@ -93,17 +99,32 @@ const playSong = () => {
 };
 
 const pauseSong = () => {
+  pausedTime = 0;
   if (isPlaying) {
     isPlaying = false;
     pauseSongBtn.classList.add('hide');
     playSongBtn.classList.remove('hide');
     musicFile.pause();
+    pausedTime = musicFile.currentTime;
+    console.log(pausedTime);
     clearInterval(intervalID);
   }
 };
 
 const nextSong = () => {
+  pausedTime = 0;
   if (!isPlaying) {
+    currentSong = songs[++currentNumber];
+    if (currentNumber > songs.length - 1) {
+      currentNumber = songs.length - 1;
+      return;
+    }
+    musicFile.src = currentSong.audioSrc;
+    albumImg.src = currentSong.imgSrc;
+    const albumTittleSong = document.querySelector('.albumTittleSong');
+    const albumTittleArtist = document.querySelector('.albumTittleArtist');
+    albumTittleSong.innerHTML = currentSong.songName;
+    albumTittleArtist.innerHTML = currentSong.artistName;
     return;
   }
 
@@ -120,6 +141,17 @@ const nextSong = () => {
 
 const preSong = (e) => {
   if (!isPlaying) {
+    currentSong = songs[--currentNumber];
+    if (currentNumber < 0) {
+      currentNumber = 0;
+      return;
+    }
+    musicFile.src = currentSong.audioSrc;
+    albumImg.src = currentSong.imgSrc;
+    const albumTittleSong = document.querySelector('.albumTittleSong');
+    const albumTittleArtist = document.querySelector('.albumTittleArtist');
+    albumTittleSong.innerHTML = currentSong.songName;
+    albumTittleArtist.innerHTML = currentSong.artistName;
     return;
   }
   if (currentNumber === 0) {
@@ -142,17 +174,22 @@ const randomCheck = () => {
   }
 };
 
+const loopPlay = () => {
+  if (isRandom) {
+    islooping = false;
+    return;
+  }
+  islooping = !islooping;
+};
+
 const autoPlay = () => {
-  if (isRandom === true) {
+  if (islooping === true && currentNumber === songs.length - 1) {
     currentNumber = 0;
+    isPlaying = false;
     playSong();
   } else {
     nextSong();
   }
-};
-
-const loopPlay = () => {
-  autoPlay();
 };
 
 playSongBtn.addEventListener('click', playSong);
@@ -162,3 +199,5 @@ preSongBtn.addEventListener('click', preSong);
 randomBtn.addEventListener('click', randomCheck);
 musicFile.addEventListener('ended', autoPlay);
 loopBtn.addEventListener('click', loopPlay);
+
+//如何让setinterval立即开始
