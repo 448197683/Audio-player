@@ -1,0 +1,113 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background-color: #c7141777;
+  display: flex;
+  justify-content: center;
+  color: white;
+}
+.player {
+  position: relative;
+}
+.iphone {
+  width: 350px;
+  margin-top: 50px;
+}
+.container {
+  position: absolute;
+  top: 142px;
+  width: 293px;
+  height: 517px;
+  left: 28px;
+  background-color: #3a447a;
+  padding: 15px;
+}
+.statusBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+.statusBarIcons {
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: gold;
+}
+.albumCover {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  user-select: none;
+}
+.albumImg {
+  width: 250px;
+  height: 250px;
+  border-radius: 10px;
+  user-select: none;
+}
+.albumTittle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+.albumTittle .fa-heart {
+  color: tomato;
+}
+.albumTittleSong {
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+.albumTittleArtist {
+  opacity: 0.5;
+  font-size: 12px;
+}
+.timer {
+  display: flex;
+  justify-content: space-between;
+  user-select: none;
+  margin-bottom: 15px;
+}
+.seek {
+  width: 100%;
+  height: 5px;
+  background-color: white;
+  margin-bottom: 15px;
+}
+.fillBar {
+  width: 0;
+  height: 5px;
+  background-color: tomato;
+  position: absolute;
+}
+.playBtns {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 16px;
+}
+.playBtns i {
+  color: gold;
+}
+.playBtns i:hover {
+  transform: scale(1.25);
+  color: tomato;
+}
+.hide {
+  display: none;
+}
+.playBtns i.random {
+  color: cornflowerblue;
+}
