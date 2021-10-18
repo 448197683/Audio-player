@@ -5,8 +5,10 @@ const albumImg = document.querySelector('.albumImg');
 const preSongBtn = document.querySelector('.fa-step-backward');
 const randomBtn = document.querySelector('.fa-random');
 const loopBtn = document.querySelector('.fa-redo');
+const seekRange = document.querySelector('#seekRange');
 
 const musicFile = new Audio();
+musicFile.preload = `metadata`;
 
 let isPlaying = false;
 let isRandom = false;
@@ -15,6 +17,7 @@ let randomNumber;
 let islooping = false;
 let intervalID;
 let pausedTime;
+let moveTime;
 
 const songs = [
   {
@@ -49,23 +52,27 @@ const randomSong = () => {
   return (randomNumber = Math.floor(Math.random() * songs.length));
 };
 
-const seekBar = () => {
-  const fillBar = document.querySelector('.fillBar');
+const seekBar = (currentValue) => {
   const totalTime = document.querySelector('.timerFull');
   const timerPlaying = document.querySelector('.timerPlayed');
   const songDuration = musicFile.duration;
   const songCurrentTime = musicFile.currentTime;
-  fillBar.style.width = `${(songCurrentTime / songDuration) * 100}%`;
+  seekRange.value = `${(songCurrentTime / songDuration) * 100}`;
   const totalMinutes = Math.floor(songDuration / 60);
   const totalSeconds = Math.floor(songDuration % 60);
-  totalTime.innerHTML = `${
-    totalMinutes < 10 ? `0${totalMinutes}` : totalMinutes
-  }:${totalSeconds < 10 ? `0${totalSeconds}` : totalSeconds}`;
-  const seekMinutes = Math.floor(songCurrentTime / 60);
-  const seekSeconds = Math.floor(songCurrentTime % 60);
-  timerPlaying.innerHTML = `${
-    seekMinutes < 10 ? `0${seekMinutes}` : seekMinutes
-  }:${seekSeconds < 10 ? `0${seekSeconds}` : seekSeconds}`;
+  if (musicFile.readyState <= 1) {
+    timerPlaying.innerHTML = `00:00`;
+    totalTime.innerHTML = `00:00`;
+  } else {
+    totalTime.innerHTML = `${
+      totalMinutes < 10 ? `0${totalMinutes}` : totalMinutes
+    }:${totalSeconds < 10 ? `0${totalSeconds}` : totalSeconds}`;
+    const seekMinutes = Math.floor(songCurrentTime / 60);
+    const seekSeconds = Math.floor(songCurrentTime % 60);
+    timerPlaying.innerHTML = `${
+      seekMinutes < 10 ? `0${seekMinutes}` : seekMinutes
+    }:${seekSeconds < 10 ? `0${seekSeconds}` : seekSeconds}`;
+  }
 };
 
 const playSong = () => {
@@ -125,7 +132,11 @@ const nextSong = () => {
     const albumTittleArtist = document.querySelector('.albumTittleArtist');
     albumTittleSong.innerHTML = currentSong.songName;
     albumTittleArtist.innerHTML = currentSong.artistName;
-    return;
+    if (musicFile.readyState <= 1) {
+      return setTimeout(seekBar, 100);
+    } else {
+      return seekBar();
+    }
   }
 
   if (currentNumber === songs.length - 1) {
@@ -152,7 +163,11 @@ const preSong = (e) => {
     const albumTittleArtist = document.querySelector('.albumTittleArtist');
     albumTittleSong.innerHTML = currentSong.songName;
     albumTittleArtist.innerHTML = currentSong.artistName;
-    return;
+    if (musicFile.readyState <= 1) {
+      return setTimeout(seekBar, 100);
+    } else {
+      return seekBar();
+    }
   }
   if (currentNumber === 0) {
     currentNumber = songs.length - 1;
@@ -192,6 +207,10 @@ const autoPlay = () => {
   }
 };
 
+const controlSeek = () => {
+  console.log(musicFile.duration);
+};
+
 playSongBtn.addEventListener('click', playSong);
 pauseSongBtn.addEventListener('click', pauseSong);
 nextSongBtn.addEventListener('click', nextSong);
@@ -199,5 +218,12 @@ preSongBtn.addEventListener('click', preSong);
 randomBtn.addEventListener('click', randomCheck);
 musicFile.addEventListener('ended', autoPlay);
 loopBtn.addEventListener('click', loopPlay);
-
-//如何让setinterval立即开始
+seekRange.addEventListener('change', (e) => {
+  currentSong = songs[currentNumber];
+  musicFile.src = currentSong.audioSrc;
+  if (musicFile.readyState <= 1) {
+    setTimeout(controlSeek, 100);
+  } else {
+    controlSeek();
+  }
+});
