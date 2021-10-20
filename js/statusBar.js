@@ -31,7 +31,6 @@ let isLike = false;
 const likeBtn = document.querySelector('.fa-heart');
 likeBtn.addEventListener('click', () => {
   isLike = !isLike;
-  console.log(isLike);
   if (isLike === true) {
     likeBtn.style.color = `tomato`;
   } else {
