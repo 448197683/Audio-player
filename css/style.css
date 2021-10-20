@@ -64,7 +64,8 @@ body {
   user-select: none;
 }
 .albumTittle .fa-heart {
-  color: tomato;
+  color: white;
+  margin-bottom: 5px;
 }
 .albumTittleSong {
   font-size: 16px;
@@ -104,5 +105,8 @@ body {
   display: none;
 }
 .playBtns i.random {
+  color: cornflowerblue;
+}
+.fa-redo.loop {
   color: cornflowerblue;
 }

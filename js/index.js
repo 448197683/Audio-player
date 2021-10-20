@@ -1,3 +1,5 @@
+import './statusBar.js';
+
 const playSongBtn = document.querySelector('.fa-play');
 const pauseSongBtn = document.querySelector('.fa-pause');
 const nextSongBtn = document.querySelector('.fa-step-forward');
@@ -18,6 +20,7 @@ let islooping = false;
 let intervalID;
 let pausedTime;
 let moveTime;
+let currentValue;
 
 const songs = [
   {
@@ -56,13 +59,18 @@ const seekBar = (currentValue) => {
   const totalTime = document.querySelector('.timerFull');
   const timerPlaying = document.querySelector('.timerPlayed');
   const songDuration = musicFile.duration;
-  const songCurrentTime = musicFile.currentTime;
+  let songCurrentTime;
+  if (currentValue) {
+    songCurrentTime = currentValue;
+  } else {
+    songCurrentTime = musicFile.currentTime;
+  }
   seekRange.value = `${(songCurrentTime / songDuration) * 100}`;
   const totalMinutes = Math.floor(songDuration / 60);
   const totalSeconds = Math.floor(songDuration % 60);
   if (musicFile.readyState <= 1) {
-    timerPlaying.innerHTML = `00:00`;
-    totalTime.innerHTML = `00:00`;
+    /* timerPlaying.innerHTML = `00:00`;
+    totalTime.innerHTML = `00:00`; */
   } else {
     totalTime.innerHTML = `${
       totalMinutes < 10 ? `0${totalMinutes}` : totalMinutes
@@ -92,6 +100,11 @@ const playSong = () => {
     const albumTittleArtist = document.querySelector('.albumTittleArtist');
     albumTittleSong.innerHTML = currentSong.songName;
     albumTittleArtist.innerHTML = currentSong.artistName;
+    if (currentValue) {
+      musicFile.currentTime = currentValue;
+    } else if (pausedTime) {
+      musicFile.currentTime = pausedTime;
+    }
     if (pausedTime) {
       musicFile.currentTime = pausedTime;
       musicFile.play();
@@ -106,20 +119,20 @@ const playSong = () => {
 };
 
 const pauseSong = () => {
-  pausedTime = 0;
+  currentValue = undefined;
   if (isPlaying) {
     isPlaying = false;
     pauseSongBtn.classList.add('hide');
     playSongBtn.classList.remove('hide');
     musicFile.pause();
     pausedTime = musicFile.currentTime;
-    console.log(pausedTime);
     clearInterval(intervalID);
   }
 };
 
 const nextSong = () => {
   pausedTime = 0;
+  currentValue = 0;
   if (!isPlaying) {
     currentSong = songs[++currentNumber];
     if (currentNumber > songs.length - 1) {
@@ -151,6 +164,7 @@ const nextSong = () => {
 };
 
 const preSong = (e) => {
+  currentValue = 0;
   if (!isPlaying) {
     currentSong = songs[--currentNumber];
     if (currentNumber < 0) {
@@ -195,6 +209,7 @@ const loopPlay = () => {
     return;
   }
   islooping = !islooping;
+  loopBtn.classList.toggle('loop');
 };
 
 const autoPlay = () => {
@@ -208,7 +223,14 @@ const autoPlay = () => {
 };
 
 const controlSeek = () => {
-  console.log(musicFile.duration);
+  currentValue = (musicFile.duration / 100) * moveTime;
+  if (isPlaying === true) {
+    seekBar(currentValue);
+    musicFile.currentTime = currentValue;
+    musicFile.play();
+  } else {
+    seekBar(currentValue);
+  }
 };
 
 playSongBtn.addEventListener('click', playSong);
@@ -219,6 +241,7 @@ randomBtn.addEventListener('click', randomCheck);
 musicFile.addEventListener('ended', autoPlay);
 loopBtn.addEventListener('click', loopPlay);
 seekRange.addEventListener('change', (e) => {
+  moveTime = seekRange.value;
   currentSong = songs[currentNumber];
   musicFile.src = currentSong.audioSrc;
   if (musicFile.readyState <= 1) {
